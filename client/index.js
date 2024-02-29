@@ -12,19 +12,11 @@ function buildScreens() {
     const section = template.content.cloneNode(true);
     const title = section.querySelector('.title');
     title.textContent = capitalize(s);
-
+    section.firstElementChild.dataset.id = `sect-${s}`;
     ui.main.append(section);
-    section.id = (`sect-${s}`);
   }
   ui.screens = document.querySelectorAll('.screen');
-  // setDataSets();
 }
-
-// function setDataSets() {
-//   for (const s of ui.screens) {
-//     s.dataset.id = s.name;
-//   }
-// }
 
 function capitalize(s) {
   return s[0].toUpperCase() + s.slice(1);
@@ -45,14 +37,9 @@ function show(event) {
     screen.classList.add('hidden');
   }
 
-  let showScreen;
-  if (event) {
-    showScreen = event.target.dataset.screen;
-  } else {
-    showScreen = 'sect-home';
-  }
-  // document.querySelector(`[data-id="${showScreen}"]`).classList.remove('hidden');
-  document.querySelector('#' + showScreen).classList.remove('hidden');
+  const showScreen = event?.target?.dataset?.screen ?? 'sect-home';
+
+  document.querySelector(`[data-id="${showScreen}"]`).classList.remove('hidden');
 }
 
 getHandles();
