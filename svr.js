@@ -1,0 +1,8 @@
+import express from 'express';
+const app = express();
+const port = 8080;
+
+app.use(express.static('client'));
+
+app.listen(8080);
+console.log(`Listening on ${port}`);
