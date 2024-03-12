@@ -60,6 +60,7 @@ function setupNav() {
     button.textContent = s;
     button.dataset.screen = s;
     button.addEventListener('click', show);
+    button.addEventListener('click', storeState);
     ui.mainnav.append(button);
     ui.buttons[s] = button;
     if (s === 'logout') {
@@ -121,10 +122,9 @@ function showScreen(name) {
   hideAllScreens();
   showElement(ui.screens[name]);
   ui.current = name;
-  pushIt();
 }
 
-function pushIt() {
+function storeState() {
   history.pushState(ui.current, ui.current, `/app/${ui.current}`);
 }
 
@@ -223,8 +223,7 @@ async function checkLoggedIn() {
 
 function loadInitialScreen() {
   ui.current = readPath();
-  hideAllScreens();
-  showElement(ui.screens[ui.current]);
+  showScreen(ui.current);
 }
 
 /*
@@ -239,7 +238,7 @@ async function main() {
   await getAllUsers();
   await checkLoggedIn();
   window.addEventListener('popstate', loadInitialScreen);
-  showElement(ui.screens[readPath()]);
+  loadInitialScreen();
 }
 
 // start!
