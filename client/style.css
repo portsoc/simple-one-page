@@ -4,17 +4,95 @@
 
 footer {
   border-top: 0.1rem solid;
+  background: whitesmoke;
+  margin-top:0;
+  padding: 0.5rem;
 }
 
 header {
   border-bottom: 0.1rem solid;
+  background: whitesmoke;
+  padding-left: 0.3rem;
+  padding-right: 0.3rem;
+}
+
+header h1 {
+  padding-left: 0.3rem;
 }
 
 header>nav {
   padding-bottom: 1em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
-header>nav>button.active {
+header>nav>button:disabled {
   background: navy;
   color: white;
+}
+
+header>nav>button {
+  min-width: 8em;
+}
+
+body {
+  max-width: 50rem;
+  margin: auto;
+  padding: 0 0.2rem;
+  background: lightsteelblue;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+nav.userlist {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1rem;
+  margin-left: 1rem;
+}
+
+nav.userlist>button {
+  font-size: 1em;
+  min-width: 8em;
+  padding: 0.2em 0 0.2em 0;
+
+}
+
+.screen section {
+  background: lightsteelblue;
+  padding: 0.5rem 0.5rem;
+}
+
+.screen section>p{
+  margin-top: 0;
+}
+
+
+
+main {
+  margin: 0;
+  background: whitesmoke;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  flex: 1 1 auto;
+}
+
+h2 {
+  margin-top: 0;
+  padding-top: 0.5em;
+}
+
+h1 {
+  margin-top: 0;
+  padding-top: 0.5em;
+}
+
+.screen {
+  padding-bottom: 1em;
 }

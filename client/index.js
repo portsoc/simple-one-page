@@ -18,10 +18,14 @@ const user = () => localStorage.getItem('user') ?? null;
 function getHandles() {
   ui.mainnav = document.querySelector('header > nav');
   ui.main = document.querySelector('main');
+  ui.footer = document.querySelector('footer');
+  ui.footer.status = ui.footer.firstElementChild;
   // this will store references to each screen element once they are created
   ui.screens = {};
   // helper function to get an array of all the screen elements
   ui.getScreens = () => Object.values(ui.screens);
+  // helper function to get an array of all the nav buttons
+  ui.getButtons = () => Object.values(ui.buttons);
   templates.screen = document.querySelector('#tmp-screen');
 }
 
@@ -109,6 +113,12 @@ function hideAllScreens() {
   }
 }
 
+function enableAllButtons() {
+  for (const button of ui.getButtons()) {
+    button.removeAttribute('disabled');
+  }
+}
+
 /*
  Show a screen when one of the buttons in the <nav> is pressed.
  If no event is passed, then show the `home` screen instead.
@@ -120,8 +130,11 @@ function show(event) {
 
 function showScreen(name) {
   hideAllScreens();
+  enableAllButtons();
   showElement(ui.screens[name]);
   ui.current = name;
+  document.title = `Simple SPA | ${name}`;
+  ui.buttons[name].disabled = 'disabled';
 }
 
 function storeState() {
@@ -154,6 +167,7 @@ async function login(event) {
 
   localStorage.setItem('user', userid);
   showScreen('home');
+  storeState();
   hideElement(ui.buttons.login);
   showElement(ui.buttons.logout);
 }
@@ -176,6 +190,7 @@ function populateUserData(user) {
     }
   }
   favs.textContent = out;
+  ui.footer.status.textContent = `You are logged in as: ${user.name}`;
 }
 
 async function getAllUsers() {
@@ -187,16 +202,14 @@ async function getAllUsers() {
 }
 
 function populateUserList(users) {
-  const userList = document.querySelector('.userlist');
+  const userList = document.querySelector('nav.userlist');
   userList.removeChild(userList.firstElementChild);
   for (const user of users) {
-    const li = document.createElement('li');
     const button = document.createElement('button');
     button.dataset.user = user.id;
     button.textContent = user.name;
     button.addEventListener('click', login);
-    li.append(button);
-    userList.append(li);
+    userList.append(button);
   }
 }
 
