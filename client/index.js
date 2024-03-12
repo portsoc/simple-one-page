@@ -1,12 +1,15 @@
 // Globals
 // Stores all the sections our app has
-const sections = ['home', 'about', 'contact'];
+const sections = ['home', 'about', 'contact', 'login', 'logout'];
 
 // Contains references to main UI elements
 const ui = {};
 
 // Contains references to where our templates are stored.
 const templates = {};
+
+// Quickly get the user if it's available
+const user = () => localStorage.getItem('user') ?? null;
 
 /*
   Populate the UI object with useful handles on the main areas of our
@@ -51,13 +54,20 @@ function buildScreens() {
   and setting its dataset to show the corresponding screen for this section
 */
 function setupNav() {
+  ui.buttons = {};
   for (const s of sections) {
     const button = document.createElement('button');
     button.textContent = s;
     button.dataset.screen = s;
     button.addEventListener('click', show);
     ui.mainnav.append(button);
+    ui.buttons[s] = button;
+    if (s === 'logout') {
+      hideElement(button);
+    }
   }
+
+  ui.buttons.logout.addEventListener('click', logout);
 }
 
 /*
@@ -90,16 +100,111 @@ function capitalize(s) {
 }
 
 /*
+ Hides all the screens.
+*/
+function hideAllScreens() {
+  for (const screen of ui.getScreens()) {
+    hideElement(screen);
+  }
+}
+
+/*
  Show a screen when one of the buttons in the <nav> is pressed.
  If no event is passed, then show the `home` screen instead.
 */
 function show(event) {
-  for (const screen of ui.getScreens()) {
-    screen.classList.add('hidden');
+  hideAllScreens();
+  const showScreen = event?.target?.dataset?.screen ?? 'home';
+  showElement(ui.screens[showScreen]);
+}
+
+function showScreen(name) {
+  hideAllScreens();
+  showElement(ui.screens[name]);
+}
+
+async function getUserData(userid) {
+  const response = await fetch(`/user/${userid}`);
+  if (response.ok) {
+    return await response.json();
+  } else {
+    return false;
+  }
+}
+
+async function login(event) {
+  const userid = event.target.dataset.user;
+
+  const user = await getUserData(userid);
+  populateUserData(user);
+
+  localStorage.setItem('user', userid);
+  showScreen('home');
+  hideElement(ui.buttons.login);
+  showElement(ui.buttons.logout);
+}
+
+function populateUserData(user) {
+  for (const elem of document.querySelectorAll('.username')) {
+    elem.textContent = user.name;
   }
 
-  const showScreen = event?.target?.dataset?.screen ?? 'home';
-  ui.screens[showScreen].classList.remove('hidden');
+  const favs = document.querySelector('.favourites');
+  let out = 'Your favourite foods are: ';
+  for (let i = 0; i < user.foods.length; i++) {
+    out += user.foods[i];
+    if (i === user.foods.length - 1) {
+      out += '.';
+    } else if (i === user.foods.length - 2) {
+      out += ', and ';
+    } else {
+      out += ', ';
+    }
+  }
+  favs.textContent = out;
+}
+
+async function getAllUsers() {
+  // YOU WOULD NOT have this function or route in production.
+  const response = await fetch('/users');
+  if (response.ok) {
+    populateUserList(await response.json());
+  }
+}
+
+function populateUserList(users) {
+  const userList = document.querySelector('.userlist');
+  userList.removeChild(userList.firstElementChild);
+  for (const user of users) {
+    const li = document.createElement('li');
+    const button = document.createElement('button');
+    button.dataset.user = user.id;
+    button.textContent = user.name;
+    button.addEventListener('click', login);
+    li.append(button);
+    userList.append(li);
+  }
+}
+
+function logout() {
+  localStorage.removeItem('user');
+  window.location.reload();
+}
+
+function showElement(e) {
+  e.classList.remove('hidden');
+}
+
+function hideElement(e) {
+  e.classList.add('hidden');
+}
+
+async function checkLoggedIn() {
+  if (user()) {
+    hideElement(ui.buttons.login);
+    showElement(ui.buttons.logout);
+    populateUserData(await (getUserData(user())));
+  }
 }
 
 /*
@@ -111,6 +216,8 @@ async function main() {
   buildScreens();
   setupNav();
   await getContent();
+  await getAllUsers();
+  await checkLoggedIn();
   show();
 }
 
