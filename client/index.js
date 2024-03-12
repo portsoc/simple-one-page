@@ -74,7 +74,7 @@ function setupNav() {
   Fetch the html for one 'screen' (parameter: s) in the app from the server.
 */
 async function fetchScreenContent(s) {
-  const url = `screens/${s}.inc`;
+  const url = `/screens/${s}.inc`;
   const response = await fetch(url);
   if (response.ok) {
     return await response.text();
@@ -113,27 +113,27 @@ function hideAllScreens() {
  If no event is passed, then show the `home` screen instead.
 */
 function show(event) {
-  hideAllScreens();
-  const showScreen = event?.target?.dataset?.screen ?? 'home';
-  showElement(ui.screens[showScreen]);
-  ui.current = showScreen;
-  pushIt();
+  const screen = event?.target?.dataset?.screen ?? 'home';
+  showScreen(screen);
 }
 
 function showScreen(name) {
   hideAllScreens();
   showElement(ui.screens[name]);
+  ui.current = name;
   pushIt();
 }
 
 function pushIt() {
-  history.pushState(ui.current, '', `/#/${ui.current}`);
+  history.pushState(ui.current, ui.current, `/app/${ui.current}`);
 }
 
-function popIt(e) {
-  console.log(window.location.pathname);
-  //        initValues(event.state);
-  showScreen(window.location.pathname.slice(3));
+function readPath() {
+  const path = window.location.pathname.slice(5);
+  if (path) {
+    return path;
+  }
+  return 'home';
 }
 
 
@@ -221,6 +221,12 @@ async function checkLoggedIn() {
   }
 }
 
+function loadInitialScreen() {
+  ui.current = readPath();
+  hideAllScreens();
+  showElement(ui.screens[ui.current]);
+}
+
 /*
 The main function for our app once it runs.
 */
@@ -232,8 +238,8 @@ async function main() {
   await getContent();
   await getAllUsers();
   await checkLoggedIn();
-  window.addEventListener('popstate', popIt);
-  show();
+  window.addEventListener('popstate', loadInitialScreen);
+  showElement(ui.screens[readPath()]);
 }
 
 // start!
