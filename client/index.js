@@ -26,6 +26,7 @@ function getHandles() {
   ui.getScreens = () => Object.values(ui.screens);
   // helper function to get an array of all the nav buttons
   ui.getButtons = () => Object.values(ui.buttons);
+  // templates object to store templates
   templates.screen = document.querySelector('#tmp-screen');
 }
 
@@ -178,19 +179,22 @@ function populateUserData(user) {
   }
 
   const favs = document.querySelector('.favourites');
-  let out = 'Your favourite foods are: ';
-  for (let i = 0; i < user.foods.length; i++) {
-    out += user.foods[i];
-    if (i === user.foods.length - 1) {
-      out += '.';
-    } else if (i === user.foods.length - 2) {
-      out += ', and ';
+  favs.textContent = stringifyArrayItems(user.foods, 'Your favourite foods are: ');
+  ui.footer.status.textContent = `You are logged in as: ${user.name}`;
+}
+
+function stringifyArrayItems(arr, startText = '') {
+  for (let i = 0; i < arr.length; i++) {
+    startText += arr[i];
+    if (i === arr.length - 1) {
+      startText += '.';
+    } else if (i === arr.length - 2) {
+      startText += ', and ';
     } else {
-      out += ', ';
+      startText += ', ';
     }
   }
-  favs.textContent = out;
-  ui.footer.status.textContent = `You are logged in as: ${user.name}`;
+  return startText;
 }
 
 async function getAllUsers() {
