@@ -1,3 +1,20 @@
 .hidden {
   display: none;
 }
+
+footer {
+  border-top: 0.1rem solid;
+}
+
+header {
+  border-bottom: 0.1rem solid;
+}
+
+header>nav {
+  padding-bottom: 1em;
+}
+
+header>nav>button.active {
+  background: navy;
+  color: white;
+}

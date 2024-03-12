@@ -1,0 +1,1 @@
+<p>Welcome to this simple one page app. Use the buttons above to navigate.</p>
