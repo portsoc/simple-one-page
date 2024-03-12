@@ -116,12 +116,26 @@ function show(event) {
   hideAllScreens();
   const showScreen = event?.target?.dataset?.screen ?? 'home';
   showElement(ui.screens[showScreen]);
+  ui.current = showScreen;
+  pushIt();
 }
 
 function showScreen(name) {
   hideAllScreens();
   showElement(ui.screens[name]);
+  pushIt();
 }
+
+function pushIt() {
+  history.pushState(ui.current, '', `/#/${ui.current}`);
+}
+
+function popIt(e) {
+  console.log(window.location.pathname);
+  //        initValues(event.state);
+  showScreen(window.location.pathname.slice(3));
+}
+
 
 async function getUserData(userid) {
   const response = await fetch(`/user/${userid}`);
@@ -218,6 +232,7 @@ async function main() {
   await getContent();
   await getAllUsers();
   await checkLoggedIn();
+  window.addEventListener('popstate', popIt);
   show();
 }
 
