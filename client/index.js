@@ -217,7 +217,11 @@ async function login(event) {
   populateUserData(user);
 
   localStorage.setItem('user', userid);
-  showScreen(ui.previous);
+  if (ui.previous === 'logout') {
+    showScreen('home');
+  } else {
+    showScreen(ui.previous);
+  }
   storeState();
   hideElement(ui.buttons.login);
   showElement(ui.buttons.logout);
