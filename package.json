@@ -1,14 +1,13 @@
 {
-  "name": "objects",
+  "name": "simple-single-page-application",
   "version": "1.0.0",
-  "description": "",
+  "description": "A basic single page application which allows modification of user data using built in test accounts",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node svr.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Matt Dennis <matt.dennis@port.ac.uk>",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
