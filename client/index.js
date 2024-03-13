@@ -1,8 +1,34 @@
 // Globals
-// This is where we define how many sections our app has, there is
+// This is where we define how many pages our app has, there is
 // expected to be an associated .inc file in the 'screens' folder
 // with the content.
-const sections = ['home', 'foods', 'about', 'contact', 'login', 'logout'];
+
+const pages = [
+  {
+    screen: 'home',
+    title: 'Home',
+  },
+  {
+    screen: 'foods',
+    title: 'My Food',
+  },
+  {
+    screen: 'about',
+    title: 'About',
+  },
+  {
+    screen: 'contact',
+    title: 'Contact',
+  },
+  {
+    screen: 'login',
+    title: 'Sign in',
+  },
+  {
+    screen: 'logout',
+    title: 'Sign out',
+  },
+];
 
 // Contains references to main UI elements
 const ui = {};
@@ -31,6 +57,7 @@ function getHandles() {
   ui.getButtons = () => Object.values(ui.buttons);
   // templates object to store templates
   templates.screen = document.querySelector('#tmp-screen');
+  templates.foodInput = document.querySelector('#tmp-food-input');
 }
 
 /*
@@ -39,7 +66,7 @@ function getHandles() {
 */
 function buildScreens() {
   const template = templates.screen;
-  for (const s of sections) {
+  for (const page of pages) {
     // by default we get a document fragment containing our <section>, so
     // we have to ask for its firstElementChild.
     // Not intuitive, but there you go
@@ -47,14 +74,14 @@ function buildScreens() {
 
     // set the title of the section, with the first letter capitalised
     const title = section.querySelector('.title');
-    title.textContent = capitalize(s);
+    title.textContent = page.title;
 
-    section.dataset.id = `sect-${s}`;
-    section.dataset.name = s;
+    section.dataset.id = `sect-${page.screen}`;
+    section.dataset.name = page.screen;
 
     ui.main.append(section);
     // store this screen in the ui global for eas(ier) access later.
-    ui.screens[s] = section;
+    ui.screens[page.screen] = section;
   }
 }
 
@@ -66,15 +93,15 @@ function buildScreens() {
 */
 function setupNav() {
   ui.buttons = {};
-  for (const s of sections) {
+  for (const page of pages) {
     const button = document.createElement('button');
-    button.textContent = s;
-    button.dataset.screen = s;
+    button.textContent = page.title;
+    button.dataset.screen = page.screen;
     button.addEventListener('click', show);
     button.addEventListener('click', storeState);
     ui.mainnav.append(button);
-    ui.buttons[s] = button;
-    if (s === 'logout') {
+    ui.buttons[page.screen] = button;
+    if (page.screen === 'logout') {
       hideElement(button);
     }
   }
@@ -96,22 +123,16 @@ async function fetchScreenContent(s) {
 }
 
 /*
-  get the content for each screen for all sections in the app
+  get the content for each screen for all pages in the app
 */
 async function getContent() {
-  for (const section of sections) {
-    const content = await fetchScreenContent(section);
+  for (const page of pages) {
+    const content = await fetchScreenContent(page.screen);
     const article = document.createElement('article');
     article.innerHTML = content;
-    ui.screens[section].append(article);
+    ui.screens[page.screen].append(article);
   }
   ui.foodEditor = document.querySelector('.food-editor');
-}
-/*
-Utility function to capitalise the first letter of a string
-*/
-function capitalize(s) {
-  return s[0].toUpperCase() + s.slice(1);
 }
 
 /*
@@ -122,7 +143,9 @@ function hideAllScreens() {
     hideElement(screen);
   }
 }
-
+/*
+ Enable all the header nav buttons
+*/
 function enableAllButtons() {
   for (const button of ui.getButtons()) {
     button.removeAttribute('disabled');
@@ -211,7 +234,9 @@ function populateUserData(user) {
   buildFoodEditor(user.foods);
   ui.footer.loginStatus.textContent = `You are logged in as: ${user.name}. `;
 }
-
+/*
+ Updates the favourite foods sentence where relevant
+*/
 function updateFoods(foods) {
   const favs = document.querySelectorAll('.favourites');
   for (const fav of favs) {
@@ -219,11 +244,34 @@ function updateFoods(foods) {
   }
 }
 
+/*
+ Silly function to turn the array of favourite foods
+ for the user into a sentence.
+*/
+function stringifyArrayItems(arr, startText = '') {
+  for (let i = 0; i < arr.length; i++) {
+    startText += arr[i];
+    if (i === arr.length - 1) {
+      startText += '.';
+    } else if (i === arr.length - 2) {
+      startText += ', and ';
+    } else {
+      startText += ', ';
+    }
+  }
+  return startText;
+}
+
+/*
+ Build the favourite foods editor
+*/
 function buildFoodEditor(foods) {
   ui.foodEditor.classList.remove('hidden');
   const list = ui.foodEditor.querySelector('ol');
+  // as we only update a single food,
+  // we need the index for when we send to the server later.
   for (let i = 0; i < foods.length; i++) {
-    const row = document.querySelector('#tmp-food-input').content.cloneNode(true).firstElementChild;
+    const row = templates.foodInput.content.cloneNode(true).firstElementChild;
     const input = row.querySelector('.food-entry');
     input.value = foods[i];
     input.removeAttribute('disabled');
@@ -239,16 +287,29 @@ function buildFoodEditor(foods) {
     list.append(row);
   }
 }
-
+/*
+  event handler for when the input fields are changed
+  we need to enable the relevant save buttons
+*/
 function foodsChange(event) {
   const save = event.target.parentElement.querySelector('button');
   save.removeAttribute('disabled');
   save.addEventListener('click', updateFood);
 }
 
+/*
+  event handler for when the save buttons are pressed.
+  we need to get the array index of the food being edited,
+  and the value of the new food. Then call the sendFoodUpdate function
+  to actually make the request to the server.
+*/
 async function updateFood(event) {
   const foodIndex = event.target.dataset.foodindex;
+  // let the user know we're saving
   addToStatus('saving...', true);
+  // disable other saves while we're busy with this one
+  // we need to remember the state of the other save buttons
+  // in case other fields were edited.
   const buttons = ui.foodEditor.querySelectorAll('button');
   const buttonsToReEnable = [];
   for (const button of buttons) {
@@ -257,23 +318,29 @@ async function updateFood(event) {
     }
     button.setAttribute('disabled', 'disabled');
   }
+  // pull the new food data from the correct input field
   const food = ui.foodEditor.querySelector(`input[data-foodindex="${foodIndex}"]`).value;
 
-  const saved = await sendFoodUpdate(foodIndex, food);
+  // pass this on to the sendFoodUpdate function to send this to the server
+  const updatedUser = await sendFoodUpdate(foodIndex, food);
 
+  // re-enable any relevant buttons
   for (const button of buttonsToReEnable) {
     button.removeAttribute('disabled');
   }
 
-  if (saved) {
+  if (updatedUser) {
     addToStatus('save successful');
+    // the button of the save that we just performed should be disabled
     ui.foodEditor.querySelector(`button[data-foodindex="${foodIndex}"]`).disabled = 'disabled';
-    refreshUI(saved);
+    // poke the UI to update the favourite foods sentences on other screens
+    refreshUI(updatedUser);
   } else {
     addToStatus('could not save due to some error, try refreshing the page.', true);
   }
 }
 
+// sends a new favourite food to the server using a PUT request
 async function sendFoodUpdate(index, food) {
   const payload = {
     id: user(),
@@ -295,9 +362,11 @@ async function sendFoodUpdate(index, food) {
     return false;
   }
 
+  // the server returns us a new copy of the user after we save.
   return await response.json();
 }
 
+// refreshes the UI with any relevant changes
 function refreshUI(user) {
   for (const elem of document.querySelectorAll('.username')) {
     elem.textContent = user.name;
@@ -305,31 +374,15 @@ function refreshUI(user) {
   updateFoods(user.foods);
 }
 
+// allows us to post messages to the status message in the footer.
+// if persistent is true, then this message will not disappear.
 function addToStatus(message, persistent = false) {
   ui.footer.saveStatus.textContent = message;
   if (!persistent) {
     setTimeout(() => {
       ui.footer.saveStatus.textContent = 'ready';
-    }, 2000);
+    }, 5000);
   }
-}
-
-/*
- Silly function to turn the array of favourite foods
- for the user into a sentence.
-*/
-function stringifyArrayItems(arr, startText = '') {
-  for (let i = 0; i < arr.length; i++) {
-    startText += arr[i];
-    if (i === arr.length - 1) {
-      startText += '.';
-    } else if (i === arr.length - 2) {
-      startText += ', and ';
-    } else {
-      startText += ', ';
-    }
-  }
-  return startText;
 }
 
 /*

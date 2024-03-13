@@ -1,5 +1,5 @@
 <section>
-<p>Select a user account below to login:</p>
+<p>Select a user account below to sign in:</p>
 <nav class ="userlist"><p>No users were returned :( </p> </nav>
 </section>
 
