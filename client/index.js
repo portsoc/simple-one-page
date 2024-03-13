@@ -134,6 +134,7 @@ function enableAllButtons() {
  If no event is passed, then show the `home` screen instead.
 */
 function show(event) {
+  ui.previous = ui.current;
   const screen = event?.target?.dataset?.screen ?? 'home';
   showScreen(screen);
 }
@@ -193,7 +194,7 @@ async function login(event) {
   populateUserData(user);
 
   localStorage.setItem('user', userid);
-  showScreen('home');
+  showScreen(ui.previous);
   storeState();
   hideElement(ui.buttons.login);
   showElement(ui.buttons.logout);
@@ -219,6 +220,7 @@ function updateFoods(foods) {
 }
 
 function buildFoodEditor(foods) {
+  ui.foodEditor.classList.remove('hidden');
   const list = ui.foodEditor.querySelector('ol');
   for (let i = 0; i < foods.length; i++) {
     const row = document.querySelector('#tmp-food-input').content.cloneNode(true).firstElementChild;
@@ -227,6 +229,11 @@ function buildFoodEditor(foods) {
     input.removeAttribute('disabled');
     input.dataset.foodindex = i;
     input.addEventListener('input', foodsChange);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        updateFood(event);
+      }
+    });
     const save = row.querySelector('button');
     save.dataset.foodindex = i;
     list.append(row);
@@ -250,7 +257,7 @@ async function updateFood(event) {
     }
     button.setAttribute('disabled', 'disabled');
   }
-  const food = event.target.previousElementSibling.value;
+  const food = ui.foodEditor.querySelector(`input[data-foodindex="${foodIndex}"]`).value;
 
   const saved = await sendFoodUpdate(foodIndex, food);
 
@@ -260,7 +267,7 @@ async function updateFood(event) {
 
   if (saved) {
     addToStatus('save successful');
-    event.target.setAttribute('disabled', 'disabled');
+    ui.foodEditor.querySelector(`button[data-foodindex="${foodIndex}"]`).disabled = 'disabled';
     refreshUI(saved);
   } else {
     addToStatus('could not save due to some error, try refreshing the page.', true);
