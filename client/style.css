@@ -1,17 +1,28 @@
+:root {
+  --main-bg-color: lightsteelblue;
+  --button-selected-text-color: white;
+  --content-bg-color: whitesmoke;
+}
+
 .hidden {
   display: none;
 }
 
 footer {
   border-top: 0.05rem solid;
-  background: whitesmoke;
+  background: var(--content-bg-color);
   margin-top: 0;
   padding: 0.5rem;
 }
 
+footer p {
+  margin: 0.5em;
+  font-size: 0.8em;
+}
+
 header {
   border-bottom: 0.05rem solid;
-  background: whitesmoke;
+  background: var(--content-bg-color);
   padding-left: 0.3rem;
   padding-right: 0.3rem;
 }
@@ -29,8 +40,8 @@ header>nav {
 }
 
 header>nav>button:disabled {
-  background: navy;
-  color: white;
+  background: var(--main-bg-color);
+  color: var(--button-selected-text-color);
 }
 
 header>nav>button {
@@ -41,7 +52,7 @@ body {
   max-width: 50rem;
   margin: auto;
   padding: 0 0.2rem;
-  background: lightsteelblue;
+  background: var(--main-bg-color);
   font-family: sans-serif;
   display: flex;
   flex-direction: column;
@@ -65,7 +76,7 @@ nav.userlist>button {
 }
 
 .screen section {
-  background: lightsteelblue;
+  background: var(--main-bg-color);
   padding: 0.5rem 0.5rem;
 }
 
@@ -77,7 +88,7 @@ nav.userlist>button {
 
 main {
   margin: 0;
-  background: whitesmoke;
+  background: var(--content-bg-color);
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   flex: 1 1 auto;
@@ -98,17 +109,25 @@ h1 {
 }
 
 @media (prefers-color-scheme: dark) {
-
-  body,
-  .screen section,
-  header>nav>button:disabled {
-    color: white;
-    background: black;
+  :root {
+    --main-bg-color: rgb(74, 74, 74);
+    --button-selected-text-color: white;
+    --content-bg-color: rgb(113, 120, 142);
   }
 
-  main,
-  footer,
-  header {
-    background: #a9a9a9;
+  .screen section {
+    background: rgb(74, 74, 74);
+  }
+
+  body {
+    color: white;
+  }
+
+  a {
+    color: rgb(229, 235, 255)
+  }
+
+  a:visited {
+    color: rgb(188, 197, 229)
   }
 }
