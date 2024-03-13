@@ -11,7 +11,7 @@ This small web app runs in a single page in the web browser. It has support for 
 * provides a simple server which handles api routes to retrieve and update user data, as well as serve the application
 
 ## files
-* `server.js` - a simple express application to serve the application and provide a small API
+* `svr.js` - a simple express application to serve the application and provide a small API
 * `users.js` - user data storage, in memory only. If you restart the server it will revert to default values. Feel free to add persistent storage!
 * `client/index.html` - bare bones structure of the application
 * `client/index.js` - the app's functionality that runs once the HTML has loaded
