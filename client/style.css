@@ -3,14 +3,14 @@
 }
 
 footer {
-  border-top: 0.1rem solid;
+  border-top: 0.05rem solid;
   background: whitesmoke;
-  margin-top:0;
+  margin-top: 0;
   padding: 0.5rem;
 }
 
 header {
-  border-bottom: 0.1rem solid;
+  border-bottom: 0.05rem solid;
   background: whitesmoke;
   padding-left: 0.3rem;
   padding-right: 0.3rem;
@@ -69,7 +69,7 @@ nav.userlist>button {
   padding: 0.5rem 0.5rem;
 }
 
-.screen section>p{
+.screen section>p {
   margin-top: 0;
 }
 
@@ -95,4 +95,20 @@ h1 {
 
 .screen {
   padding-bottom: 1em;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  body,
+  .screen section,
+  header>nav>button:disabled {
+    color: white;
+    background: black;
+  }
+
+  main,
+  footer,
+  header {
+    background: #a9a9a9;
+  }
 }
