@@ -1,5 +1,7 @@
 // Globals
-// Stores all the sections our app has
+// This is where we define how many sections our app has, there is
+// expected to be an associated .inc file in the 'screens' folder
+// with the content.
 const sections = ['home', 'about', 'contact', 'login', 'logout'];
 
 // Contains references to main UI elements
