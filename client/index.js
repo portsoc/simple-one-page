@@ -2,7 +2,7 @@
 // This is where we define how many sections our app has, there is
 // expected to be an associated .inc file in the 'screens' folder
 // with the content.
-const sections = ['home', 'about', 'contact', 'login', 'logout'];
+const sections = ['home', 'foods', 'about', 'contact', 'login', 'logout'];
 
 // Contains references to main UI elements
 const ui = {};
@@ -21,7 +21,8 @@ function getHandles() {
   ui.mainnav = document.querySelector('header > nav');
   ui.main = document.querySelector('main');
   ui.footer = document.querySelector('footer');
-  ui.footer.status = ui.footer.firstElementChild;
+  ui.footer.loginStatus = ui.footer.querySelector('.login-status');
+  ui.footer.saveStatus = ui.footer.querySelector('.save-status');
   // this will store references to each screen element once they are created
   ui.screens = {};
   // helper function to get an array of all the screen elements
@@ -104,6 +105,7 @@ async function getContent() {
     article.innerHTML = content;
     ui.screens[section].append(article);
   }
+  ui.foodEditor = document.querySelector('.food-editor');
 }
 /*
 Utility function to capitalise the first letter of a string
@@ -204,10 +206,105 @@ function populateUserData(user) {
   for (const elem of document.querySelectorAll('.username')) {
     elem.textContent = user.name;
   }
+  updateFoods(user.foods);
+  buildFoodEditor(user.foods);
+  ui.footer.loginStatus.textContent = `You are logged in as: ${user.name}. `;
+}
 
-  const favs = document.querySelector('.favourites');
-  favs.textContent = stringifyArrayItems(user.foods, 'Your favourite foods are: ');
-  ui.footer.status.textContent = `You are logged in as: ${user.name}`;
+function updateFoods(foods) {
+  const favs = document.querySelectorAll('.favourites');
+  for (const fav of favs) {
+    fav.textContent = stringifyArrayItems(foods, 'Your favourite foods are: ');
+  }
+}
+
+function buildFoodEditor(foods) {
+  const list = ui.foodEditor.querySelector('ol');
+  for (let i = 0; i < foods.length; i++) {
+    const row = document.querySelector('#tmp-food-input').content.cloneNode(true).firstElementChild;
+    const input = row.querySelector('.food-entry');
+    input.value = foods[i];
+    input.removeAttribute('disabled');
+    input.dataset.foodindex = i;
+    input.addEventListener('input', foodsChange);
+    const save = row.querySelector('button');
+    save.dataset.foodindex = i;
+    list.append(row);
+  }
+}
+
+function foodsChange(event) {
+  const save = event.target.parentElement.querySelector('button');
+  save.removeAttribute('disabled');
+  save.addEventListener('click', updateFood);
+}
+
+async function updateFood(event) {
+  const foodIndex = event.target.dataset.foodindex;
+  addToStatus('saving...', true);
+  const buttons = ui.foodEditor.querySelectorAll('button');
+  const buttonsToReEnable = [];
+  for (const button of buttons) {
+    if (!button.disabled) {
+      buttonsToReEnable.push(button);
+    }
+    button.setAttribute('disabled', 'disabled');
+  }
+  const food = event.target.previousElementSibling.value;
+
+  const saved = await sendFoodUpdate(foodIndex, food);
+
+  for (const button of buttonsToReEnable) {
+    button.removeAttribute('disabled');
+  }
+
+  if (saved) {
+    addToStatus('save successful');
+    event.target.setAttribute('disabled', 'disabled');
+    refreshUI(saved);
+  } else {
+    addToStatus('could not save due to some error, try refreshing the page.', true);
+  }
+}
+
+async function sendFoodUpdate(index, food) {
+  const payload = {
+    id: user(),
+    food,
+    index,
+  };
+
+  if (!payload.id || !payload.food || !payload.index) {
+    return false;
+  }
+
+  const response = await fetch('/user', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    return false;
+  }
+
+  return await response.json();
+}
+
+function refreshUI(user) {
+  for (const elem of document.querySelectorAll('.username')) {
+    elem.textContent = user.name;
+  }
+  updateFoods(user.foods);
+}
+
+function addToStatus(message, persistent = false) {
+  ui.footer.saveStatus.textContent = message;
+  if (!persistent) {
+    setTimeout(() => {
+      ui.footer.saveStatus.textContent = 'ready';
+    }, 2000);
+  }
 }
 
 /*

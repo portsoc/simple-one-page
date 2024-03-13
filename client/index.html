@@ -1,5 +1,5 @@
 <!doctype html>
-<script src="/index.js" type="module" defer></script>
+<script src="/index.js" type="module"></script>
 <link rel="stylesheet" href="/style.css">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simple SPA | Loading...</title>
@@ -15,11 +15,17 @@
 </main>
 
 <footer>
-  <p>Not logged in.</p>
+  <p class="login-status">Not Logged in.</p>
+  <p class="save-status">Ready.</p>
 </footer>
 
 <template id="tmp-screen">
   <section class="screen hidden">
     <h2 class="title">Some title</h2>
   </section>
+</template>
+
+<template id="tmp-food-input">
+  <li><input class="food-entry" type="text" disabled><button disabled>save</button>
+  </li>
 </template>
