@@ -217,7 +217,7 @@ async function login(event) {
   populateUserData(user);
 
   localStorage.setItem('user', userid);
-  if (ui.previous === 'logout') {
+  if (ui.previous === 'logout' || !ui.previous) {
     showScreen('home');
   } else {
     showScreen(ui.previous);
