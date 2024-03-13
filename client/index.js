@@ -50,6 +50,7 @@ function buildScreens() {
     section.dataset.name = s;
 
     ui.main.append(section);
+    // store this screen in the ui global for eas(ier) access later.
     ui.screens[s] = section;
   }
 }
@@ -57,6 +58,8 @@ function buildScreens() {
 /*
   Build the navbar by creating a button for each section that our app has
   and setting its dataset to show the corresponding screen for this section
+  Add relevant event handlers to each button. Each one will show its associated
+  screen when pressed, and update the browser's history when it does so.
 */
 function setupNav() {
   ui.buttons = {};
@@ -100,7 +103,9 @@ async function getContent() {
     ui.screens[section].append(article);
   }
 }
-
+/*
+Utility function to capitalise the first letter of a string
+*/
 function capitalize(s) {
   return s[0].toUpperCase() + s.slice(1);
 }
@@ -129,6 +134,10 @@ function show(event) {
   showScreen(screen);
 }
 
+/*
+ Show a screen with the specified name
+*/
+
 function showScreen(name) {
   hideAllScreens();
   enableAllButtons();
@@ -138,10 +147,17 @@ function showScreen(name) {
   ui.buttons[name].disabled = 'disabled';
 }
 
+/*
+ Store the app's state in the History API to allow the back button
+ to work
+*/
 function storeState() {
   history.pushState(ui.current, ui.current, `/app/${ui.current}`);
 }
 
+/*
+ Read the URL path from the address bar, utility function
+*/
 function readPath() {
   const path = window.location.pathname.slice(5);
   if (path) {
@@ -150,7 +166,9 @@ function readPath() {
   return 'home';
 }
 
-
+/*
+ Fetch a the data for a specified user from the server
+*/
 async function getUserData(userid) {
   const response = await fetch(`/user/${userid}`);
   if (response.ok) {
@@ -160,6 +178,10 @@ async function getUserData(userid) {
   }
 }
 
+/*
+ Handle a login - get the user's data from the server, then call
+ utility functions to populate the relevant areas of the app
+*/
 async function login(event) {
   const userid = event.target.dataset.user;
 
@@ -173,6 +195,9 @@ async function login(event) {
   showElement(ui.buttons.logout);
 }
 
+/*
+ Utility function to add user data to relevant screens of the app
+*/
 function populateUserData(user) {
   for (const elem of document.querySelectorAll('.username')) {
     elem.textContent = user.name;
@@ -183,6 +208,10 @@ function populateUserData(user) {
   ui.footer.status.textContent = `You are logged in as: ${user.name}`;
 }
 
+/*
+ Silly function to turn the array of favourite foods
+ for the user into a sentence.
+*/
 function stringifyArrayItems(arr, startText = '') {
   for (let i = 0; i < arr.length; i++) {
     startText += arr[i];
@@ -197,6 +226,9 @@ function stringifyArrayItems(arr, startText = '') {
   return startText;
 }
 
+/*
+Get all user data from the server for testing purposes
+*/
 async function getAllUsers() {
   // YOU WOULD NOT have this function or route in production.
   const response = await fetch('/users');
@@ -205,6 +237,9 @@ async function getAllUsers() {
   }
 }
 
+/*
+ Populate user accounts on the login screen
+*/
 function populateUserList(users) {
   const userList = document.querySelector('nav.userlist');
   userList.removeChild(userList.firstElementChild);
@@ -217,19 +252,32 @@ function populateUserList(users) {
   }
 }
 
+/*
+Handle a logout. Client side only.
+*/
 function logout() {
   localStorage.removeItem('user');
   window.location.reload();
 }
 
+/*
+Utility function to show the specified element
+*/
 function showElement(e) {
   e.classList.remove('hidden');
 }
 
+/*
+Utility function to hide the specified element
+*/
 function hideElement(e) {
   e.classList.add('hidden');
 }
 
+/*
+ Function to check whether we've seen this user before
+ at startup, and set the login/logout buttons to the appropriate state.
+*/
 async function checkLoggedIn() {
   if (user()) {
     hideElement(ui.buttons.login);
@@ -238,6 +286,9 @@ async function checkLoggedIn() {
   }
 }
 
+/*
+ Load a screen at startup, based on the URL in the address bar of the browser.
+*/
 function loadInitialScreen() {
   ui.current = readPath();
   showScreen(ui.current);
@@ -246,7 +297,6 @@ function loadInitialScreen() {
 /*
 The main function for our app once it runs.
 */
-
 async function main() {
   getHandles();
   buildScreens();
