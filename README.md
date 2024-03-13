@@ -43,3 +43,4 @@ As the server redirects all requests to `/app/*` to `index.html`, `href` and `sr
 ## Starting the application
 
 * run `npm start`
+* visit `http://localhost:8080` in your browser.
