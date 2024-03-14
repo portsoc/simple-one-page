@@ -1,0 +1,17 @@
+<!doctype html>
+<link rel="stylesheet" href="/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>404 (not found)</title>
+<header>
+  <h1>404</h1>
+</header>
+<main>
+  <p>The resource <code></code> was not found on this server.</p>
+</main>
+<footer>
+  <p>Simple SPA server.</p>
+</footer>
+
+<script type="module">
+  document.querySelector('code').textContent = window.location.pathname;
+</script>

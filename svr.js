@@ -25,9 +25,14 @@ app.get('/users', (req, res) => res.json(users.getAllUsers()));
 app.get('/user/:id', (req, res) => res.json(users.getUser(req.params.id)));
 app.put('/user', express.json(), updateFood);
 
-/* final catch-all route to index.html defined last */
+/* handle calls to /app (as these are in app links, they need to be handled by index.html) */
 app.get('/app/*/', (req, res) => {
   res.sendFile(`${__dirname}/client/index.html`);
+});
+
+/* final route, handle a 404 */
+app.all('*', (req, res) => {
+  res.status(404).sendFile(`${__dirname}/server-error-pages/404.html`);
 });
 
 app.listen(8080);

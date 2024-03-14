@@ -28,6 +28,10 @@ const pages = [
     screen: 'logout',
     title: 'Sign out',
   },
+  {
+    screen: 'error',
+    title: 'Sorry...',
+  },
 ];
 
 // Contains references to main UI elements
@@ -94,6 +98,7 @@ function buildScreens() {
 function setupNav() {
   ui.buttons = {};
   for (const page of pages) {
+    if (page.screen === 'error') { continue; }
     const button = document.createElement('button');
     button.textContent = page.title;
     button.dataset.screen = page.screen;
@@ -169,10 +174,15 @@ function show(event) {
 function showScreen(name) {
   hideAllScreens();
   enableAllButtons();
+  if (!ui.screens[name]) {
+    name = 'error';
+  }
   showElement(ui.screens[name]);
   ui.current = name;
   document.title = `Simple SPA | ${name}`;
-  ui.buttons[name].disabled = 'disabled';
+  if (name !== 'error') {
+    ui.buttons[name].disabled = 'disabled';
+  }
 }
 
 /*
