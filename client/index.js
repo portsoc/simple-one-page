@@ -123,7 +123,7 @@ async function fetchScreenContent(s) {
   if (response.ok) {
     return await response.text();
   } else {
-    return `sorry, a ${response.status} error ocurred retrieving section data for: <pre>${url}</pre>`;
+    return `sorry, a ${response.status} error ocurred retrieving section data for: <code>${url}</code>`;
   }
 }
 
@@ -162,6 +162,8 @@ function enableAllButtons() {
  If no event is passed, then show the `home` screen instead.
 */
 function show(event) {
+  // ui.previous is used after one of the buttons on the login screen
+  // is pressed to return the user to where they were.
   ui.previous = ui.current;
   const screen = event?.target?.dataset?.screen ?? 'home';
   showScreen(screen);
@@ -178,6 +180,8 @@ function showScreen(name) {
     name = 'error';
   }
   showElement(ui.screens[name]);
+  // store the current application state (i.e. which screen is currently showing)
+  // used by storeState() to push this onto the browser's history stack
   ui.current = name;
   document.title = `Simple SPA | ${name}`;
   if (name !== 'error') {
