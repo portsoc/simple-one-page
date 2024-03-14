@@ -222,7 +222,10 @@ async function getUserData(userid) {
 
 /*
  Handle a login - get the user's data from the server, then call
- utility functions to populate the relevant areas of the app
+ utility functions to populate the relevant areas of the app.
+ Returns the user to the previous page they were on, unless it was the
+ logout page OR they came to the login page directly via /app/login,
+ in these cases send them to the homepage.
 */
 async function login(event) {
   const userid = event.target.dataset.user;
