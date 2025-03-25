@@ -2,7 +2,6 @@
 // This is where we define how many pages our app has, there is
 // expected to be an associated .inc file in the 'screens' folder
 // with the content.
-
 const pages = [
   {
     screen: 'home',
@@ -42,6 +41,9 @@ const templates = {};
 
 // Quickly get the user if it's available
 const user = () => localStorage.getItem('user') ?? null;
+
+// we need a handle on the deferredPrompt event to show the install prompt
+let deferredPrompt;
 
 /*
   Populate the UI object with useful handles on the main areas of our
@@ -478,6 +480,10 @@ function loadInitialScreen() {
 The main function for our app once it runs.
 */
 async function main() {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    deferredPrompt = e;
+  });
+
   getHandles();
   buildScreens();
   setupNav();

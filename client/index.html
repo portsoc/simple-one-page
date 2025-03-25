@@ -2,6 +2,7 @@
 <script src="/index.js" type="module"></script>
 <link rel="stylesheet" href="/style.css">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="manifest" href="manifest.json">
 <title>Simple SPA | Loading...</title>
 
 <header>
@@ -29,3 +30,10 @@
   <li><input class="food-entry" type="text" disabled><button disabled>save</button>
   </li>
 </template>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    //navigator.serviceWorker.register('sw.js', { scope: '/simple-one-page/' });
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
