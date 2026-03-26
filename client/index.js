@@ -110,7 +110,10 @@ function setupNav() {
     }
   }
 
-  ui.buttons.logout.addEventListener('click', logout);
+  // only wire logout handler if the button exists
+  if (ui.buttons && ui.buttons.logout) {
+    ui.buttons.logout.addEventListener('click', logout);
+  }
 }
 
 /*
@@ -176,14 +179,26 @@ function showScreen(name) {
   hideAllScreens();
   enableAllButtons();
   if (!ui.screens[name]) {
-    name = 'error';
+    // requested screen doesn't exist — fall back to the error screen
+    // if that doesn't exist, fall back to the first available screen
+    if (ui.screens.error) {
+      name = 'error';
+    } else {
+      const first = ui.getScreens()[0];
+      if (first) {
+        name = first.dataset.name || 'home';
+      } else {
+        // nothing to show
+        return;
+      }
+    }
   }
   showElement(ui.screens[name]);
   // store the current application state (i.e. which screen is currently showing)
   // used by storeState() to push this onto the browser's history stack
   ui.current = name;
   document.title = `Simple SPA | ${name}`;
-  if (name !== 'error') {
+  if (name !== 'error' && ui.buttons[name]) {
     ui.buttons[name].disabled = 'disabled';
   }
 }
@@ -286,8 +301,11 @@ function stringifyArrayItems(arr, startText = '') {
  Build the favourite foods editor
 */
 function buildFoodEditor(foods) {
+  // if the foods editor is not present on the page, silently skip
+  if (!ui.foodEditor) return;
   ui.foodEditor.classList.remove('hidden');
   const list = ui.foodEditor.querySelector('ol');
+  if (!list) return;
   // as we only update a single food,
   // we need the index for when we send to the server later.
   for (let i = 0; i < foods.length; i++) {
@@ -324,7 +342,8 @@ function foodsChange(event) {
   to actually make the request to the server.
 */
 async function updateFood(event) {
-  const foodIndex = event.target.dataset.foodindex;
+  const foodIndex = event?.target?.dataset?.foodindex;
+  if (!ui.foodEditor || typeof foodIndex === 'undefined') return false;
   // let the user know we're saving
   addToStatus('saving...', true);
   // disable other saves while we're busy with this one
@@ -421,7 +440,10 @@ async function getAllUsers() {
 */
 function populateUserList(users) {
   const userList = document.querySelector('nav.userlist');
-  userList.removeChild(userList.firstElementChild);
+  if (!userList) return;
+  if (userList.firstElementChild) {
+    userList.removeChild(userList.firstElementChild);
+  }
   for (const user of users) {
     const button = document.createElement('button');
     button.dataset.user = user.id;
@@ -443,6 +465,7 @@ function logout() {
 Utility function to show the specified element
 */
 function showElement(e) {
+  if (!e || !e.classList) return;
   e.classList.remove('hidden');
 }
 
@@ -450,6 +473,7 @@ function showElement(e) {
 Utility function to hide the specified element
 */
 function hideElement(e) {
+  if (!e || !e.classList) return;
   e.classList.add('hidden');
 }
 
