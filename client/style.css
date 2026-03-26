@@ -68,6 +68,67 @@ nav.userlist {
   margin-left: 1rem;
 }
 
+/* Nav toggle (hidden on wide screens) */
+.nav-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  padding: 0.4rem;
+}
+
+/* Responsive collapse behaviour */
+@media (max-width: 600px) {
+  header>nav {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 0;
+    padding-bottom: 0.5rem;
+    background: var(--content-bg-color);
+  }
+
+  header>nav.open {
+    display: flex;
+  }
+
+  header>nav>button {
+    width: 100%;
+    min-width: 0;
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .nav-toggle {
+    display: inline-block;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  header h1 {
+    font-size: 1.1rem;
+    margin: 0;
+    padding: 0.4rem 0;
+    flex: 1 1 auto;
+  }
+
+  /* when nav is open hide the title and use a full-width column layout */
+  header.nav-open {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  header.nav-open h1 {
+    display: none;
+  }
+}
+
 nav.userlist>button {
   font-size: 1em;
   min-width: 8em;

@@ -108,11 +108,33 @@ function setupNav() {
     if (page.screen === 'logout') {
       hideElement(button);
     }
+    // close the mobile nav when a button is clicked
+    button.addEventListener('click', () => {
+      if (ui.mainnav && ui.mainnav.classList.contains('open')) {
+        ui.mainnav.classList.remove('open');
+        const toggle = document.querySelector('.nav-toggle');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        const hdr = document.querySelector('header');
+        if (hdr) hdr.classList.remove('nav-open');
+      }
+    });
   }
 
   // only wire logout handler if the button exists
   if (ui.buttons && ui.buttons.logout) {
     ui.buttons.logout.addEventListener('click', logout);
+  }
+
+  // wire the nav toggle for small screens
+  const navToggle = document.querySelector('.nav-toggle');
+  if (navToggle) {
+    navToggle.addEventListener('click', () => {
+      if (!ui.mainnav) return;
+      const isOpen = ui.mainnav.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      const hdr = document.querySelector('header');
+      if (hdr) hdr.classList.toggle('nav-open', isOpen);
+    });
   }
 }
 
@@ -507,6 +529,16 @@ async function main() {
   await getContent();
   await getAllUsers();
   await checkLoggedIn();
+  // close mobile nav on resize to avoid stale open state
+  window.addEventListener('resize', () => {
+    if (ui.mainnav && window.innerWidth > 600) {
+      ui.mainnav.classList.remove('open');
+      const toggle = document.querySelector('.nav-toggle');
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
+      const hdr = document.querySelector('header');
+      if (hdr) hdr.classList.remove('nav-open');
+    }
+  });
   window.addEventListener('popstate', loadInitialScreen);
   loadInitialScreen();
 }
